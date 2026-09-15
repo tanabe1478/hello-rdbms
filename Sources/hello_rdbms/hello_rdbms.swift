@@ -23,7 +23,14 @@ struct HelloRdbms {
                 }
                 continue
             }
-            print("Unrecognized command '\(input)'")
+            switch prepareStatement(input) {
+            case .success(let statement):
+                executeStatement(statement)
+            case .failure(.unrecognizedStatement(let keyword)):
+                print("Unrecognized keyword at start of '\(keyword)'.")
+            case .failure(.syntaxError(let message)):
+                print("Syntax error: \(message)")
+            }
         }
     }
 }
