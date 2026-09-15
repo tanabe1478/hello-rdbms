@@ -50,13 +50,21 @@ func prepareStatement(_ input: String) -> Result<Statement, PrepareError> {
     }
 }
 
-/// `Statement` を実行する。テーブルはまだ無いので、解釈した内容を表示するだけ。
-func executeStatement(_ statement: Statement) {
+/// `Statement` を実行する (executor 相当)。
+func executeStatement(_ statement: Statement, table: inout Table) {
     switch statement {
     case .insert(let row):
-        print("Executing: insert (\(row.id), '\(row.username)', '\(row.email)')")
+        switch table.insert(row) {
+        case .success(let ctid):
+            print("Inserted at ctid \(ctid).")
+        case .failure(.tableFull):
+            print("Error: table is full.")
+        }
     case .select:
-        print("Executing: select")
+        // シーケンシャルスキャンで全行を表示
+        for (ctid, row) in table.seqScan() {
+            print("\(ctid)\t(\(row.id), \(row.username), \(row.email))")
+        }
+        print("Executed.")
     }
-    print("Executed.")
 }
