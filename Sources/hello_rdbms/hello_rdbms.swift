@@ -7,6 +7,7 @@ func printPrompt() {
 @main
 struct HelloRdbms {
     static func main() {
+        var table = Table()
         while true {
             printPrompt()
             guard let input = readLine() else {
@@ -25,7 +26,7 @@ struct HelloRdbms {
             }
             switch prepareStatement(input) {
             case .success(let statement):
-                executeStatement(statement)
+                executeStatement(statement, table: &table)
             case .failure(.unrecognizedStatement(let keyword)):
                 print("Unrecognized keyword at start of '\(keyword)'.")
             case .failure(.syntaxError(let message)):
